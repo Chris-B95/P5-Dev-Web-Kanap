@@ -2,8 +2,8 @@ let filteredList = [];
 
 function filterLocalStorage() {
     let products = [];
-    for (let i = 0; i < localStorage.length; i++) { 
-    const retrievedObject = localStorage.key(i);
+    for (let i = 0; i < localStorage.length; i++) {
+        const retrievedObject = localStorage.key(i);
         const filter = /kanap/;
         console.log(retrievedObject);
         if (retrievedObject.split(":")[0].match(filter)) {
@@ -12,7 +12,6 @@ function filterLocalStorage() {
     };
     console.log(products);
     filteredList = products;
-    // return products;
 }
 
 let allProducts = [];
@@ -20,74 +19,25 @@ let allProducts = [];
 async function getProductsList(filteredLocalStorageList) {
     try {
         let products = [];
-        // for (let i = 0; i < filteredLocalStorageList.length; i++) {
-            await Promise.all(filteredLocalStorageList.map(async (element) => {
-                const retrieveId = element.split(":")[1];
-                // const retrieveId = filteredLocalStorageList[i].split(":")[1];
-                console.log(retrieveId);
-                if (!products.find(element => element._id === retrieveId)) {
+        await Promise.all(filteredLocalStorageList.map(async (element) => {
+            const retrieveId = element.split(":")[1];
+            console.log(retrieveId);
+            if (!products.find(element => element._id === retrieveId)) {
                 let response = await fetch("http://localhost:3000/api/products/" + retrieveId);
                 let product = await response.json();
                 console.log(product);
                 products.push(product);
-              }}));
-        //     filteredLocalStorageList.forEach(async (element) => {
-        //     const retrieveId = element.split(":")[1];
-        //     // const retrieveId = filteredLocalStorageList[i].split(":")[1];
-        //     console.log(retrieveId);
-        //     if (!products.find(element => element._id === retrieveId)) {
-        //     let response = await fetch("http://localhost:3000/api/products/" + retrieveId);
-        //     let product = await response.json();
-        //     console.log(product);
-        //     products.push(product);}
-        // });
+            }
+        }));
         console.log(products);
         allProducts = products;
-        // return products;
     }
     catch (err) {
         console.log(err);
     }
 };
 
-// const filteredList = filterLocalStorage();
-// const allProducts = await getProductsList();
-// const allProducts = (async () => {return await getProductsList(filteredList);})();
-// const allProducts = (async () => {
-//     const data =  await getProductsList(filteredList);
-//     return data;
-// }
-// )();
-
-// async function getProductsList() {
-//     try {
-//         let products = [];
-//         for (let i = 0; i < localStorage.length; i++) {
-//             const retrieveObject = localStorage.key(i);
-//             const filter = /kanap/;
-//             console.log(retrieveObject.split(":")[0]);
-//             console.log(retrieveObject.split(":")[1]);
-//             console.log(retrieveObject.split(":")[2]);
-//             if (retrieveObject.split(":")[0].match(filter)) {
-//                 const retrieveId = retrieveObject.split(":")[1];
-//                 console.log(retrieveId);
-//                 let response = await fetch("http://localhost:3000/api/products/" + retrieveId);
-//                 let product = await response.json();
-//                 console.log(product);
-//                 products.push(product)
-//             }
-//         }
-//         console.log(products);
-//         return products;
-//     }
-//     catch (err) {
-//         console.log(err);
-//     }
-// }
-
-async function updatePrice() {
-    // const filteredList = filterLocalStorage();
-    // const allProducts = await getProductsList(filteredList);
+async function updatePrice() { //ASYNC NECESSAIRE????
     let totalNumberOfArticles = 0;
     let totalPrice = 0;
     filteredList.forEach(function (element) {
@@ -115,73 +65,118 @@ function getInputValues() {
     return contact;
 }
 
-async function getUserInfos() {
-    // const queryString = window.location.search;
-    // const urlParams = new URLSearchParams(queryString);
-    // const userFirstName = urlParams.get("firstName");
-    // if (!userFirstName.length) {
-    //     console.log("champ vide");
-    // }
-    // const userLastName = urlParams.get("lastName");
-    // const userAddress = urlParams.get("address");
-    // const userCity = urlParams.get("city");
-    // const userEmail = urlParams.get("email");
-    // console.log(userFirstName);
-    // console.log(userLastName);
-    // console.log(userAddress);
-    // console.log(userCity);
-    // console.log(userEmail);
-    // let masque1 = /[@]/g; // /\w+@{1}\w+/
-    // if (userEmail.match(masque1)) {
-    //     console.log("email valide");
-    // }
-    // else {
-    //     console.log("email invalide");
-    // }
-    // const contact = { firstName: userFirstName, lastName: userLastName, address: userAddress, city: userCity, email: userEmail };
-    // console.log(contact);
-    const contact = getInputValues();
-    const products = [];
-    filteredList.forEach(function (element) {
-        const id = element.split(":")[1];
-        products.push(id);
-    });
+function areInputsValid() {
+    let inputsValid = true;
+    const firstNameInput = document.getElementById("firstName").value;
+    const firstNameInputError = document.getElementById("firstNameErrorMsg");
+    const firstNamefilter = /^[^0-9_!¡?÷?¿/\\+=@#$%&*(){}|~<>;:[\]]{2,}$/g;
+    if (!firstNameInput) {
+        firstNameInputError.textContent = "Champ obligatoire!"
+        inputsValid = false;
+    } else {
+        if (!firstNameInput.match(firstNamefilter)) {
+            firstNameInputError.textContent = "Prénom invalide!"
+            inputsValid = false;
+        }
+        else {
+            firstNameInputError.textContent = ""
+        }
+    }
+    const lastNameInput = document.getElementById("lastName").value;
+    const lastNameInputError = document.getElementById("lastNameErrorMsg");
+    const lastNamefilter = /^[^0-9_!¡?÷?¿/\\+=@#$%&*(){}|~<>;:[\]]{2,}$/g;
+    if (!lastNameInput) {
+        lastNameInputError.textContent = "Champ obligatoire!"
+        inputsValid = false;
+    } else {
+        if (!lastNameInput.match(lastNamefilter)) {
+            lastNameInputError.textContent = "Nom invalide!"
+            inputsValid = false;
+        }
+        else {
+            lastNameInputError.textContent = ""
+        }
+    }
+    const addressInput = document.getElementById("address").value;
+    const addressInputError = document.getElementById("addressErrorMsg");
+    const addressfilter = /^[^_!¡?÷?¿/\\+=@#$%&*(){}|~<>;:[\]]{3,}$/g;
+    if (!addressInput) {
+        addressInputError.textContent = "Champ obligatoire!"
+        inputsValid = false;
+    } else {
+        if (!addressInput.match(addressfilter)) {
+            addressInputError.textContent = "Adresse invalide!"
+            inputsValid = false;
+        }
+        else {
+            addressInputError.textContent = ""
+        }
+    }
+    const cityInput = document.getElementById("city").value;
+    const cityInputError = document.getElementById("cityErrorMsg");
+    const cityfilter = /^[^0-9_!¡?÷?¿/\\+=@#$%&*(){}|~<>;:[\]]{2,}$/g;
+    if (!cityInput) {
+        cityInputError.textContent = "Champ obligatoire!"
+        inputsValid = false;
+    } else {
+        if (!cityInput.match(cityfilter)) {
+            cityInputError.textContent = "Ville invalide!"
+            inputsValid = false;
+        }
+        else {
+            cityInputError.textContent = ""
+        }
+    }
+    const emailInput = document.getElementById("email").value;
+    const emailInputError = document.getElementById("emailErrorMsg");
+    const emailfilter = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g;
+    if (!emailInput) {
+        emailInputError.textContent = "Champ obligatoire!"
+        inputsValid = false;
+    } else {
+        if (!emailInput.match(emailfilter)) {
+            emailInputError.textContent = "E-mail invalide!"
+            inputsValid = false;
+        }
+        else {
+            emailInputError.textContent = ""
+        }
+    }
+    return inputsValid;
+}
 
-    let response = await fetch("http://localhost:3000/api/products/order", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({contact, products})
-    });
+async function validateOrder() {
+    if (areInputsValid()) {
+        const contact = getInputValues();
+        let products = [];
+        filteredList.forEach(function (element) {
+            const id = element.split(":")[1];
+            products.push(id);
+        });
 
-    let result = await response.json();
-    // alert(JSON.stringify({contact, products}));
-    // alert(JSON.stringify(result.orderId));
-    window.location.replace("./confirmation.html?orderId=" + result.orderId /*JSON.stringify(result.orderId)*/);
+        let response = await fetch("http://localhost:3000/api/products/order", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify({ contact, products })
+        });
+
+        let result = await response.json();
+        window.location.replace("./confirmation.html?orderId=" + result.orderId);
+    }
 }
 
 async function main() {
-    // const filteredList = filterLocalStorage();
-    // const allProducts = await getProductsList(filteredList);
     filterLocalStorage();
     await getProductsList(filteredList);
-    console.log(filteredList);
-    console.log(allProducts);
-    console.log(allProducts.length);
-    // let totalNumberOfArticles = 0;
-    // let totalPrice = 0;
     filteredList.forEach(function (element) {
         const id = element.split(":")[1];
         const color = element.split(":")[2];
         const articleNumber = localStorage.getItem(element);
-        // totalNumberOfArticles += articleNumber * 1;
         console.log(allProducts.length);
         const currentProduct = allProducts.find(obj => obj._id === id);
         console.log(currentProduct);
-        // let currentPrice = currentProduct.price;
-        // currentPrice *= articleNumber;
-        // totalPrice += currentPrice;
         const articleTag = document.createElement("article");
         articleTag.setAttribute("class", "cart__item");
         articleTag.setAttribute("data-id", id);
@@ -236,10 +231,6 @@ async function main() {
         itemsList.appendChild(articleTag);
     });
     updatePrice();
-    // const pArticleNumber = document.getElementById("totalQuantity");
-    // pArticleNumber.textContent = totalNumberOfArticles;
-    // const pTotalPrice = document.getElementById("totalPrice");
-    // pTotalPrice.textContent = totalPrice;
     const inputModify = document.querySelectorAll(".itemQuantity");
     inputModify.forEach(element => element.addEventListener("change", function () {
         console.log("qty changed");
@@ -263,17 +254,11 @@ async function main() {
         else {
             const warningExist = document.getElementById(currentItem + "warning-msg");
             if (warningExist) {
-                // const selectorString = "#" + currentItem + "warning-msg";
-                // console.log(selectorString);
-                // const pWarning = document.querySelector(selectorString);
-                // pWarning.remove();
                 warningExist.remove();
             }
             localStorage.setItem("kanap:" + currentId + ":" + currentColor, articleNumber);
             element.setAttribute("value", articleNumber);
         }
-        /*localStorage.setItem(currentId + ":" + currentColor, articleNumber);
-        element.setAttribute("value", articleNumber);*/
         updatePrice();
     }));
     const deleteItem = document.querySelectorAll(".deleteItem");
@@ -287,7 +272,7 @@ async function main() {
         updatePrice();
     }));
     const boutonCommander = document.getElementById("order");
-    boutonCommander.addEventListener("click", getUserInfos);
+    boutonCommander.addEventListener("click", validateOrder);
 }
 
 main();
