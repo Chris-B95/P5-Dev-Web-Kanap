@@ -24,9 +24,9 @@ async function addToCart() {
     console.log(prodColor);
     const prodNumber = document.getElementById("quantity").value;
     console.log(prodNumber);
-    nameOfKey = localStorage.getItem(prodId + ":" + prodColor);
+    nameOfKey = localStorage.getItem("kanap:" + prodId + ":" + prodColor);
     if (nameOfKey) {
-        const actualValue = localStorage.getItem(prodId + ":" + prodColor) * 1;
+        const actualValue = localStorage.getItem("kanap:" + prodId + ":" + prodColor) * 1;
         const newValue = actualValue + (prodNumber * 1);
         if ((newValue > 100) || (newValue < 1)) {
             console.log("mauvaise valeur");
@@ -45,7 +45,7 @@ async function addToCart() {
                 const pWarning = document.querySelector("#warning-msg")
                 pWarning.remove();
             }
-            localStorage.setItem(prodId + ":" + prodColor, newValue);
+            localStorage.setItem("kanap:" + prodId + ":" + prodColor, newValue);
         }
 
     }
@@ -67,7 +67,7 @@ async function addToCart() {
                 /*const pWarning = document.querySelector("#warning-msg")*/
                 /*pWarning*/warningExist.remove();
             }
-            localStorage.setItem(prodId + ":" + prodColor, prodNumber);
+            localStorage.setItem("kanap:" + prodId + ":" + prodColor, prodNumber);
         }
     }
     console.log(localStorage);

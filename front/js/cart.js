@@ -1,45 +1,191 @@
-/*async function getProductsList() {
+let filteredList = [];
 
-    try {
-        let response = await fetch("http://localhost:3000/api/products/");
-        let productsList = await response.json();
-        return (productsList);
-    } catch (err) {
-        console.log(err);
-    }
-}*/
+function filterLocalStorage() {
+    let products = [];
+    for (let i = 0; i < localStorage.length; i++) { 
+    const retrievedObject = localStorage.key(i);
+        const filter = /kanap/;
+        console.log(retrievedObject);
+        if (retrievedObject.split(":")[0].match(filter)) {
+            products.push(retrievedObject);
+        }
+    };
+    console.log(products);
+    filteredList = products;
+    // return products;
+}
 
-async function getProductsList() {
+let allProducts = [];
+
+async function getProductsList(filteredLocalStorageList) {
     try {
         let products = [];
-        for (let i = 0; i < localStorage.length; i++) {
-            const retrieveObject = localStorage.key(i);
-            const retrieveId = retrieveObject.split(":");
-            console.log(retrieveId[0]);
-            let response = await fetch("http://localhost:3000/api/products/" + retrieveId[0]);
-            let product = await response.json();
-            console.log(product);
-            products.push(product)
-        }
+        // for (let i = 0; i < filteredLocalStorageList.length; i++) {
+            await Promise.all(filteredLocalStorageList.map(async (element) => {
+                const retrieveId = element.split(":")[1];
+                // const retrieveId = filteredLocalStorageList[i].split(":")[1];
+                console.log(retrieveId);
+                if (!products.find(element => element._id === retrieveId)) {
+                let response = await fetch("http://localhost:3000/api/products/" + retrieveId);
+                let product = await response.json();
+                console.log(product);
+                products.push(product);
+              }}));
+        //     filteredLocalStorageList.forEach(async (element) => {
+        //     const retrieveId = element.split(":")[1];
+        //     // const retrieveId = filteredLocalStorageList[i].split(":")[1];
+        //     console.log(retrieveId);
+        //     if (!products.find(element => element._id === retrieveId)) {
+        //     let response = await fetch("http://localhost:3000/api/products/" + retrieveId);
+        //     let product = await response.json();
+        //     console.log(product);
+        //     products.push(product);}
+        // });
         console.log(products);
-        return products;
+        allProducts = products;
+        // return products;
     }
     catch (err) {
         console.log(err);
     }
+};
+
+// const filteredList = filterLocalStorage();
+// const allProducts = await getProductsList();
+// const allProducts = (async () => {return await getProductsList(filteredList);})();
+// const allProducts = (async () => {
+//     const data =  await getProductsList(filteredList);
+//     return data;
+// }
+// )();
+
+// async function getProductsList() {
+//     try {
+//         let products = [];
+//         for (let i = 0; i < localStorage.length; i++) {
+//             const retrieveObject = localStorage.key(i);
+//             const filter = /kanap/;
+//             console.log(retrieveObject.split(":")[0]);
+//             console.log(retrieveObject.split(":")[1]);
+//             console.log(retrieveObject.split(":")[2]);
+//             if (retrieveObject.split(":")[0].match(filter)) {
+//                 const retrieveId = retrieveObject.split(":")[1];
+//                 console.log(retrieveId);
+//                 let response = await fetch("http://localhost:3000/api/products/" + retrieveId);
+//                 let product = await response.json();
+//                 console.log(product);
+//                 products.push(product)
+//             }
+//         }
+//         console.log(products);
+//         return products;
+//     }
+//     catch (err) {
+//         console.log(err);
+//     }
+// }
+
+async function updatePrice() {
+    // const filteredList = filterLocalStorage();
+    // const allProducts = await getProductsList(filteredList);
+    let totalNumberOfArticles = 0;
+    let totalPrice = 0;
+    filteredList.forEach(function (element) {
+        const id = element.split(":")[1];
+        const articleNumber = localStorage.getItem(element);
+        totalNumberOfArticles += articleNumber * 1;
+        const currentProduct = allProducts.find(obj => obj._id === id);
+        let currentPrice = currentProduct.price;
+        currentPrice *= articleNumber;
+        totalPrice += currentPrice;
+    });
+    const pArticleNumber = document.getElementById("totalQuantity");
+    pArticleNumber.textContent = totalNumberOfArticles;
+    const pTotalPrice = document.getElementById("totalPrice");
+    pTotalPrice.textContent = totalPrice;
+}
+
+function getInputValues() {
+    const firstNameInput = document.getElementById("firstName").value;
+    const lastNameInput = document.getElementById("lastName").value;
+    const addressInput = document.getElementById("address").value;
+    const cityInput = document.getElementById("city").value;
+    const emailInput = document.getElementById("email").value;
+    const contact = { firstName: firstNameInput, lastName: lastNameInput, address: addressInput, city: cityInput, email: emailInput };
+    return contact;
+}
+
+async function getUserInfos() {
+    // const queryString = window.location.search;
+    // const urlParams = new URLSearchParams(queryString);
+    // const userFirstName = urlParams.get("firstName");
+    // if (!userFirstName.length) {
+    //     console.log("champ vide");
+    // }
+    // const userLastName = urlParams.get("lastName");
+    // const userAddress = urlParams.get("address");
+    // const userCity = urlParams.get("city");
+    // const userEmail = urlParams.get("email");
+    // console.log(userFirstName);
+    // console.log(userLastName);
+    // console.log(userAddress);
+    // console.log(userCity);
+    // console.log(userEmail);
+    // let masque1 = /[@]/g; // /\w+@{1}\w+/
+    // if (userEmail.match(masque1)) {
+    //     console.log("email valide");
+    // }
+    // else {
+    //     console.log("email invalide");
+    // }
+    // const contact = { firstName: userFirstName, lastName: userLastName, address: userAddress, city: userCity, email: userEmail };
+    // console.log(contact);
+    const contact = getInputValues();
+    const products = [];
+    filteredList.forEach(function (element) {
+        const id = element.split(":")[1];
+        products.push(id);
+    });
+
+    let response = await fetch("http://localhost:3000/api/products/order", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify({contact, products})
+    });
+
+    let result = await response.json();
+    // alert(JSON.stringify({contact, products}));
+    // alert(JSON.stringify(result.orderId));
+    window.location.replace("./confirmation.html?orderId=" + result.orderId /*JSON.stringify(result.orderId)*/);
 }
 
 async function main() {
-    const allProducts = await getProductsList();
-    for (i = 0; i < localStorage.length; i++) {
-        const keyItem = localStorage.key(i);
-        const idAndColor = keyItem.split(":");
-        const articleNumber = localStorage.getItem(keyItem);
-        const currentProduct = allProducts.find(obj => obj._id === idAndColor[0]);
+    // const filteredList = filterLocalStorage();
+    // const allProducts = await getProductsList(filteredList);
+    filterLocalStorage();
+    await getProductsList(filteredList);
+    console.log(filteredList);
+    console.log(allProducts);
+    console.log(allProducts.length);
+    // let totalNumberOfArticles = 0;
+    // let totalPrice = 0;
+    filteredList.forEach(function (element) {
+        const id = element.split(":")[1];
+        const color = element.split(":")[2];
+        const articleNumber = localStorage.getItem(element);
+        // totalNumberOfArticles += articleNumber * 1;
+        console.log(allProducts.length);
+        const currentProduct = allProducts.find(obj => obj._id === id);
+        console.log(currentProduct);
+        // let currentPrice = currentProduct.price;
+        // currentPrice *= articleNumber;
+        // totalPrice += currentPrice;
         const articleTag = document.createElement("article");
         articleTag.setAttribute("class", "cart__item");
-        articleTag.setAttribute("data-id", idAndColor[0]);
-        articleTag.setAttribute("data-color", idAndColor[1]);
+        articleTag.setAttribute("data-id", id);
+        articleTag.setAttribute("data-color", color);
         const divTag = document.createElement("div");
         divTag.setAttribute("class", "cart__item__img");
         const imgTag = document.createElement("img");
@@ -57,7 +203,7 @@ async function main() {
         h2Tag.textContent = (currentProduct.name);
         descriptionDivTag.appendChild(h2Tag);
         const pTag = document.createElement("p");
-        pTag.textContent = (idAndColor[1]);
+        pTag.textContent = (color);
         descriptionDivTag.appendChild(pTag);
         const p2Tag = document.createElement("p");
         p2Tag.textContent = (currentProduct.price + "€");
@@ -88,15 +234,20 @@ async function main() {
         deleteDivTag.appendChild(p4Tag);
         const itemsList = document.getElementById("cart__items");
         itemsList.appendChild(articleTag);
-    };
+    });
+    updatePrice();
+    // const pArticleNumber = document.getElementById("totalQuantity");
+    // pArticleNumber.textContent = totalNumberOfArticles;
+    // const pTotalPrice = document.getElementById("totalPrice");
+    // pTotalPrice.textContent = totalPrice;
     const inputModify = document.querySelectorAll(".itemQuantity");
-    /*inputModify && */inputModify.forEach(element => element.addEventListener("change", function () {
+    inputModify.forEach(element => element.addEventListener("change", function () {
         console.log("qty changed");
         const currentArticle = this.closest("article");
         const currentId = currentArticle.dataset.id;
         const currentColor = currentArticle.dataset.color;
         const currentItem = currentId + currentColor;
-        let articleNumber = localStorage.getItem(currentId + ":" + currentColor);
+        let articleNumber = localStorage.getItem("kanap:" + currentId + ":" + currentColor);
         articleNumber = this.value;
         if ((articleNumber > 100) || (articleNumber < 1)) {
             console.log("mauvaise valeur");
@@ -112,17 +263,18 @@ async function main() {
         else {
             const warningExist = document.getElementById(currentItem + "warning-msg");
             if (warningExist) {
-                /*const selectorString = "#" + currentItem + "warning-msg";
-                console.log(selectorString);
-                const pWarning = document.querySelector(selectorString);
-                pWarning.remove();*/
+                // const selectorString = "#" + currentItem + "warning-msg";
+                // console.log(selectorString);
+                // const pWarning = document.querySelector(selectorString);
+                // pWarning.remove();
                 warningExist.remove();
             }
-            localStorage.setItem(currentId + ":" + currentColor, articleNumber);
+            localStorage.setItem("kanap:" + currentId + ":" + currentColor, articleNumber);
             element.setAttribute("value", articleNumber);
         }
         /*localStorage.setItem(currentId + ":" + currentColor, articleNumber);
         element.setAttribute("value", articleNumber);*/
+        updatePrice();
     }));
     const deleteItem = document.querySelectorAll(".deleteItem");
     deleteItem.forEach(element => element.addEventListener("click", function () {
@@ -130,9 +282,12 @@ async function main() {
         const currentArticle = this.closest("article");
         const currentId = currentArticle.dataset.id;
         const currentColor = currentArticle.dataset.color;
-        localStorage.removeItem(currentId + ":" + currentColor);
+        localStorage.removeItem("kanap:" + currentId + ":" + currentColor);
         currentArticle.remove();
+        updatePrice();
     }));
+    const boutonCommander = document.getElementById("order");
+    boutonCommander.addEventListener("click", getUserInfos);
 }
 
 main();
