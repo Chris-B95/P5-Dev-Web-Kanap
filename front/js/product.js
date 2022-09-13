@@ -91,7 +91,6 @@ async function addToCart() {
                 localStorage.setItem("kanap:" + prodId + ":" + prodColor, prodNumber);
             }
         }
-        console.log(localStorage);
     }
     else {
         const warningExist = document.getElementById("color-warning-msg");
@@ -112,7 +111,6 @@ async function addToCart() {
 async function createProduct() {
     const productParams = await getProduct();
     const productDescription = document.getElementById("description");
-    console.log(productParams);
     productDescription.textContent = (productParams.description);
     const productPrice = document.getElementById("price");
     productPrice.textContent = (productParams.price);
