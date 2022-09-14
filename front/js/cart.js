@@ -98,7 +98,7 @@ function showCart() {
 }
 
 // Affichage du prix à chaque fois qu'il est modifié
-async function updatePrice() { //ASYNC NECESSAIRE????
+function updatePrice() {
     let totalNumberOfArticles = 0;
     let totalPrice = 0;
     filteredList.forEach(function (element) {
