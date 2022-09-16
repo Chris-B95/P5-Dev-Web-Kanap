@@ -1,3 +1,8 @@
+// Vidage du panier
+function clearCart() {
+    localStorage.clear();
+}
+
 // Récupération du numéro de commande
 function getOrderId() {
     const queryString = window.location.search;
@@ -14,6 +19,7 @@ function displayOrderId(orderId) {
 
 // Fonction principale et son appel
 function main () {
+    clearCart();
     displayOrderId(getOrderId());
 }
 
